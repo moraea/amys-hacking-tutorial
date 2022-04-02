@@ -1,6 +1,20 @@
-void SLSSetAppearanceThemeSwitchesAutomatically(int edi)
+#define SWITCH_DEFAULTS @"moraea.appearance"
+
+void SLSSetAppearanceThemeSwitchesAutomatically(BOOL edi)
 {
 	trace(@"SLSSetAppearanceThemeSwitchesAutomatically %d",edi);
 	
-	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"moraea.appearance" object:nil userInfo:@{@"switches":[NSNumber numberWithInt:edi]}];
+	[NSUserDefaults.standardUserDefaults setBool:edi forKey:SWITCH_DEFAULTS];
+	
+	// as discussed we don't really need this
+	// [NSDistributedNotificationCenter.defaultCenter postNotificationName:@"moraea.appearance" object:nil userInfo:@{@"switches":[NSNumber numberWithInt:edi]}];
+}
+
+int SLSGetAppearanceThemeSwitchesAutomatically()
+{
+	BOOL result=[NSUserDefaults.standardUserDefaults boolForKey:SWITCH_DEFAULTS];
+	
+	trace(@"SLSGetAppearanceThemeSwitchesAutomatically %d",result);
+	
+	return result;
 }
