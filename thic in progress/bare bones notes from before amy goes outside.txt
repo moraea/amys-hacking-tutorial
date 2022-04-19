@@ -1,0 +1,68 @@
+Displays.prefPane
+
+something displayIcon, not sure the class
+lldb attach remoteservice
+b displayIcon
+breakpoint list
+MonitorPanel [MPDisplay displayIcon]
+
+MonitorPanel (dsc)
+
+CoreDisplay_DisplayCreateInfoDictionary
+objectForKey: display-icon
+
+CoreDisplay_DisplayCreateInfoDictionary is a stub!
+
+check assembly in caller
+edi some shit
+calls it
+uses rax as an NSDictionary
+
+CoreDisplay new (ramdisk)
+
+just calls to SLSCopyDisplayInfoDictionary, which is NOT a stub
+SL functions are dlopened in CD, not directly linked (to avoid a dependency cycle?)
+
+SkyLight old
+
+SLSCopyDisplayInfoDictionary
+uses mach_msg to call to WS
+
+_XCopyDisplayInfoDictionary
+the one that is called in WS
+uses CGXCopyDisplayInfoDictionary
+
+CoreDisplay old
+as expected, makes a CFMutableDictionary and throws various stuff in
+
+shim time!
+
+"Create rule" and "Copy" in SLS* means the returned dictionary should be retained in both cases
+and i guess stick with CD's policy of not linking SL
+
+works, but dictionary doesn't contain display-icon
+unaccelerate to compare dictionaries
+mostly the same, a few more properties in stock, but doesn't have display-icon either
+
+looks in /System/Library/Displays for icons, Zoe is just not present
+
+System Information.app
+
+SPInfoDisplay _prefetchDisplayImage
+also uses CoreDisplay_DisplayCreateInfoDictionary/display-icon but falls back to [ISIcon initWithType:UTType._typeOfCurrentDevice.identifier]
+
+IconServices
+
+ISIcon - factory makes various subclasses, in this case ISTypeIcon, superclass ISBindableIcon, superclass ISConcreteIcon
+
+ISTypeIcon makeResourceProvider
+returns ISRecordResourceProvider
+
+display-icon needs to be an NSString path
+not quite sure how to get the URL from IS, but the UTType.identifier corresponds to an icon in CoreTypes
+
+dumb hack time!
+
+oh, it uses [MPDisplay displayResolutionPreviewIcon], not displayIcon
+
+probably remaining pixelation related to displayResolutionPreviewRect? idk i'll look once i come inside
