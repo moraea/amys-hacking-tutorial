@@ -8,8 +8,17 @@
 
 #define trace NSLog
 
+NSString* process5=nil;
+__attribute__((constructor)) void process5constructor(int argc,char** argv)
+{
+	process5=[NSString stringWithUTF8String:argv[0]];
+}
+
+extern char** environ;
+
 int main()
 {
+	// the bitch
 	NSString* process0=NSProcessInfo.processInfo.arguments[0];
 	trace(@"0 %@",process0);
 	
@@ -18,6 +27,7 @@ int main()
 	NSString* process1=NSBundle.mainBundle.bundlePath;
 	trace(@"1 %@",process1);
 	
+	// from dyld
 	char process2buffer[1000];
 	unsigned int process2size=1000;
 	_NSGetExecutablePath(process2buffer,&process2size);
@@ -35,4 +45,15 @@ int main()
 	proc_pidpath(getpid(),process4buffer,PROC_PIDPATHINFO_MAXSIZE);
 	NSString* process4=[NSString stringWithUTF8String:process4buffer];
 	trace(@"4 %@",process4);
+	
+	// from a second constructor, apparently not guaranteed in the spec but works
+	trace(@"5 %@",process5);
+	
+	// extremely cursed from https://stackoverflow.com/a/37015598
+	// doesn't seem to work at all
+	/*char** process6arg=environ;
+	for(int i=0;;i++)
+	{
+		trace(@"%s",*(process6arg-i));
+	}*/
 }
