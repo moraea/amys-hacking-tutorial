@@ -1,7 +1,10 @@
+// alternatives to NSProcessInfo
+
 // clang -fmodules altprocessinfo.m -o /tmp/a && /tmp/a
 
 @import Foundation;
 @import MachO.dyld;
+#import <libproc.h>
 
 #define trace NSLog
 
@@ -26,4 +29,10 @@ int main()
 	NSString* process3=[NSString stringWithUTF8String:process3buffer];
 	free(process3buffer);
 	trace(@"3 %@",process3);
+	
+	// MAGIC FROM FLAGERS
+	char process4buffer[PROC_PIDPATHINFO_MAXSIZE];
+	proc_pidpath(getpid(),process4buffer,PROC_PIDPATHINFO_MAXSIZE);
+	NSString* process4=[NSString stringWithUTF8String:process4buffer];
+	trace(@"4 %@",process4);
 }
