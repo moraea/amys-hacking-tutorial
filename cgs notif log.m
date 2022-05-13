@@ -17,14 +17,14 @@ __attribute__((constructor)) void load()
 
 unsigned int fake_SLSRegisterConnectionNotifyProc(unsigned int edi_connectionID,void (*rsi_callback)(),unsigned int edx_type,char* rcx_context)
 {
-	trace(@"notif %x %s %@",edx_type,stringForType(edx_type),NSThread.callStackSymbols);
+	trace(@"notif 0x%x %s %@",edx_type,stringForType(edx_type),NSThread.callStackSymbols);
 	
 	return SLSRegisterConnectionNotifyProc(edi_connectionID,rsi_callback,edx_type,rcx_context);
 }
 
 unsigned int fake_SLSRegisterNotifyProc(void (*rdi_callback)(),unsigned int esi_type,char* rdx_context)
 {
-	trace(@"notif %x %s %@",esi_type,stringForType(esi_type),NSThread.callStackSymbols);
+	trace(@"notif 0x%x %s %@",esi_type,stringForType(esi_type),NSThread.callStackSymbols);
 	
 	return SLSRegisterNotifyProc(rdi_callback,esi_type,rdx_context);
 }
