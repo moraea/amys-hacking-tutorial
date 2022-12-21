@@ -1,6 +1,6 @@
 // dump all GL shaders compiled by WindowServer
-// quite difficult since GLEngine uses a function pointer system that prevents interposing
-// so, possibly sets a new personal record for cursed-ness...
+// difficult since GLEngine uses a function pointer system that prevents interposing
+// quite possibly sets a new personal record for cursed-ness...
 
 // clang -fmodules -dynamiclib shaders2.m -o /tmp/amyshaders.dylib && codesign -fs - /tmp/amyshaders.dylib && sudo launchctl setenv DYLD_INSERT_LIBRARIES /tmp/amyshaders.dylib && sudo killall -9 WindowServer
 
@@ -13,13 +13,21 @@ void (*real)(void*,void*,int,char**,int*);
 
 void mine(void* rdi,void* shader,int count,char** strings,int* lengths)
 {
-	NSString* message=[NSString stringWithFormat:@"%d --- %s --- %@\n\n",count,strings[0],NSThread.callStackSymbols];
+	NSMutableString* message=NSMutableString.alloc.init;
+	[message appendFormat:@"date: %@\n",NSDate.date.description];
+	[message appendFormat:@"count: %d\n",count];
+	for(int index=0;index<count;index++)
+	{
+		[message appendFormat:@"code (%d): %s\n",index,strings[index]];
+	}
+	[message appendFormat:@"stack: %@\n",NSThread.callStackSymbols];
+	[message appendString:@"----------\n"];
 	write(file,message.UTF8String,message.length);
 	
 	real(rdi,shader,count,strings,lengths);
 }
 
-char* fuck(char* victim,char* fake)
+char* swizzle(char* victim,char* fake)
 {
 	char* base=victim-(long)victim%0x1000;
 	assert(mprotect(base,0x2000,PROT_READ|PROT_WRITE|PROT_EXEC)==0);
@@ -32,11 +40,14 @@ char* fuck(char* victim,char* fake)
 	assert(mprotect(backup,0x1000,PROT_READ|PROT_WRITE|PROT_EXEC)==0);
 	memcpy(backup,victim,12);
 	char* back=victim+12;
-	memcpy(backup+12,"\x48\xB8",2);
+	memcpy(backup+12,"\x48\xb8",2);
 	memcpy(backup+14,&back,8);
 	memcpy(backup+22,"\xff\xe0",2);
 	
-	memcpy(victim,"\x48\xB8",2);
+	// movabs rax,<fake>
+	// jmp rax
+	
+	memcpy(victim,"\x48\xb8",2);
 	memcpy(victim+2,&fake,8);
 	memcpy(victim+10,"\xff\xe0",2);
 	
@@ -59,6 +70,6 @@ __attribute__((constructor)) void load()
 		assert(reference);
 		char* victim=(reference-0xfb5ae)+0x78386;
 		
-		real=fuck(victim,mine);
+		real=(void (*)(void*,void*,int,char**,int*))swizzle(victim,(char*)mine);
 	}
 }
