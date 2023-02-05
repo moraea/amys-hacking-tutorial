@@ -8,7 +8,7 @@
 
 // negative = invert, less than 1 = desaturate, 1 = identity, more than 1 = saturate
 
-float s2=1.0;
+float s2=1.2;
 
 int main()
 {
