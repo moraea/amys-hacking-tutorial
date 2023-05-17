@@ -1,0 +1,63 @@
+Kernel Patch
+
+for manually extracted/altered cryptex
+
+<dict>
+<key>Base</key>
+<string>_authenticate_root_hash</string>
+<key>Count</key>
+<integer>1</integer>
+<key>Enabled</key>
+<true/>
+<key>Identifier</key>
+<string>com.apple.filesystems.apfs</string>
+<key>Replace</key>
+<data>SLgAAAAAAAAAAMM=</data>
+</dict>
+
+alternative to telemetrap
+
+<dict>
+<key>Base</key>
+<string>_mt_microstackshot_start</string>
+<key>Count</key>
+<integer>1</integer>
+<key>Enabled</key>
+<true/>
+<key>Identifier</key>
+<string>kernel</string>
+<key>Replace</key>
+<data>SLgAAAAAAAAAAMM=</data>
+</dict>
+
+alternative to SIK (needs manual UpdateOptions.plist edit)
+
+<dict>
+<key>Base</key>
+<string>_fs_snapshot</string>
+<key>Count</key>
+<integer>1</integer>
+<key>Enabled</key>
+<true/>
+<key>Identifier</key>
+<string>kernel</string>
+<key>Replace</key>
+<data>SMfAAAAAAMM=</data>
+</dict>
+
+Booter Patch
+
+allow ffff rather than ffef (apple internal bit)
+
+<dict>
+<key>Count</key>
+<integer>1</integer>
+<key>Enabled</key>
+<true/>
+<key>Find</key>
+<data>QYPg7w==</data>
+<key>Identifier</key>
+<string></string>
+<key>Replace</key>
+<data>QYPg/w==</data>
+</dict>
